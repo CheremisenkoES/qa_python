@@ -2,6 +2,7 @@ import pytest
 
 from books_collector import BooksCollector
 
+
 @pytest.mark.parametrize(
     ('book_name', 'expected_books_genre'),
     (
