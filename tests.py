@@ -14,7 +14,7 @@ from books_collector import BooksCollector
 def test_add_new_book(book_name: str, expected_books_genre: {}):
     collector = BooksCollector()
     collector.add_new_book(book_name)
-    assert collector.books_genre == expected_books_genre
+    assert collector.get_books_genre() == expected_books_genre
 
 
 def test_add_new_book_existing_name_add_one():
@@ -24,7 +24,7 @@ def test_add_new_book_existing_name_add_one():
     collector.add_new_book(book_name)
     collector.add_new_book(book_name)
 
-    assert collector.books_genre == {book_name: ''}
+    assert collector.get_books_genre() == {book_name: ''}
 
 
 @pytest.mark.parametrize(
@@ -45,14 +45,14 @@ def test_set_book_genre(genre: str, expected_book_genre: str):
     collector.add_new_book(book_name)
     collector.set_book_genre(book_name, genre)
 
-    assert collector.books_genre == {book_name: expected_book_genre}
+    assert collector.get_books_genre() == {book_name: expected_book_genre}
 
 
 def test_set_book_genre_non_existent_book_pass():
     collector = BooksCollector()
     collector.set_book_genre('Some book', 'Мультфильмы')
 
-    assert collector.books_genre == {}
+    assert collector.get_books_genre() == {}
 
 
 def test_get_book_genre_non_existent_book_none():
@@ -146,7 +146,7 @@ def test_add_book_in_favorites_non_existent_book_empty_list():
 
     collector.add_book_in_favorites('Book100')
 
-    assert collector.favorites == []
+    assert collector.get_list_of_favorites_books() == []
 
 
 def test_add_book_in_favorites_new_book_one_book():
@@ -161,7 +161,7 @@ def test_add_book_in_favorites_new_book_one_book():
 
     collector.add_book_in_favorites('Book4')
 
-    assert collector.favorites == ['Book4']
+    assert collector.get_list_of_favorites_books() == ['Book4']
 
 
 def test_add_book_in_favorites_existing_book_one_book():
@@ -177,14 +177,14 @@ def test_add_book_in_favorites_existing_book_one_book():
     collector.add_book_in_favorites('Book1')
     collector.add_book_in_favorites('Book1')
 
-    assert collector.favorites == ['Book1']
+    assert collector.get_list_of_favorites_books() == ['Book1']
 
 
 def test_delete_book_from_favorites_non_existent_book_empty_list():
     collector = BooksCollector()
     collector.delete_book_from_favorites('Book1')
 
-    assert collector.favorites == []
+    assert collector.get_list_of_favorites_books() == []
 
 
 def test_delete_book_from_favorites_existing_book_empty_list():
@@ -193,7 +193,7 @@ def test_delete_book_from_favorites_existing_book_empty_list():
 
     collector.delete_book_from_favorites('Book1')
 
-    assert collector.favorites == []
+    assert collector.get_list_of_favorites_books() == []
 
 
 def test_get_list_of_favorites_books_empty_list():
