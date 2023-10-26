@@ -57,9 +57,7 @@ def test_set_book_genre_non_existent_book_pass():
 
 def test_get_book_genre_non_existent_book_none():
     collector = BooksCollector()
-    book_genre = collector.get_book_genre('Non existent book')
-
-    assert book_genre is None
+    assert collector.get_book_genre('Non existent book') is None
 
 
 def test_get_book_genre_exiting_book_none():
@@ -69,9 +67,8 @@ def test_get_book_genre_exiting_book_none():
 
     collector.add_new_book(book_name)
     collector.set_book_genre(book_name, genre)
-    book_genre = collector.get_book_genre(book_name)
 
-    assert book_genre == genre
+    assert collector.get_book_genre(book_name) == genre
 
 
 @pytest.mark.parametrize(
@@ -88,10 +85,11 @@ def test_get_book_genre_exiting_book_none():
 def test_get_books_with_specific_genre(books_genre: dict, specific_genre: str, expected_books: list):
     collector = BooksCollector()
 
-    collector.books_genre = books_genre
-    books_with_specific_genre = collector.get_books_with_specific_genre(specific_genre)
+    for book_name in books_genre:
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, books_genre[book_name])
 
-    assert books_with_specific_genre == expected_books
+    assert collector.get_books_with_specific_genre(specific_genre) == expected_books
 
 
 @pytest.mark.parametrize(
@@ -104,7 +102,10 @@ def test_get_books_with_specific_genre(books_genre: dict, specific_genre: str, e
 )
 def test_get_books_genre(books_genre: dict, expected_books_genre: dict):
     collector = BooksCollector()
-    collector.books_genre = books_genre
+
+    for book_name in books_genre:
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, books_genre[book_name])
 
     assert collector.get_books_genre() == expected_books_genre
 
@@ -129,20 +130,27 @@ def test_get_books_genre(books_genre: dict, expected_books_genre: dict):
 )
 def test_get_books_for_children(books_genre: dict, expected_books: list):
     collector = BooksCollector()
-    collector.books_genre = books_genre
+
+    for book_name in books_genre:
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, books_genre[book_name])
 
     assert collector.get_books_for_children() == expected_books
 
 
 def test_add_book_in_favorites_non_existent_book_empty_list():
     collector = BooksCollector()
-    collector.books_genre = {
+    books_genre = {
         'Book1': 'Фантастика',
         'Book2': 'Ужасы',
         'Book3': 'Детективы',
         'Book4': 'Мультфильмы',
         'Book5': 'Комедии'
     }
+
+    for book_name in books_genre:
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, books_genre[book_name])
 
     collector.add_book_in_favorites('Book100')
 
@@ -151,13 +159,17 @@ def test_add_book_in_favorites_non_existent_book_empty_list():
 
 def test_add_book_in_favorites_new_book_one_book():
     collector = BooksCollector()
-    collector.books_genre = {
+    books_genre = {
         'Book1': 'Фантастика',
         'Book2': 'Ужасы',
         'Book3': 'Детективы',
         'Book4': 'Мультфильмы',
         'Book5': 'Комедии'
     }
+
+    for book_name in books_genre:
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, books_genre[book_name])
 
     collector.add_book_in_favorites('Book4')
 
@@ -166,13 +178,17 @@ def test_add_book_in_favorites_new_book_one_book():
 
 def test_add_book_in_favorites_existing_book_one_book():
     collector = BooksCollector()
-    collector.books_genre = {
+    books_genre = {
         'Book1': 'Фантастика',
         'Book2': 'Ужасы',
         'Book3': 'Детективы',
         'Book4': 'Мультфильмы',
         'Book5': 'Комедии'
     }
+
+    for book_name in books_genre:
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, books_genre[book_name])
 
     collector.add_book_in_favorites('Book1')
     collector.add_book_in_favorites('Book1')
@@ -203,13 +219,17 @@ def test_get_list_of_favorites_books_empty_list():
 
 def test_get_list_of_favorites_books_list():
     collector = BooksCollector()
-    collector.books_genre = {
+    books_genre = {
         'Book1': 'Фантастика',
         'Book2': 'Ужасы',
         'Book3': 'Детективы',
         'Book4': 'Мультфильмы',
         'Book5': 'Комедии'
     }
+
+    for book_name in books_genre:
+        collector.add_new_book(book_name)
+        collector.set_book_genre(book_name, books_genre[book_name])
 
     collector.add_book_in_favorites('Book1')
     collector.add_book_in_favorites('Book3')
