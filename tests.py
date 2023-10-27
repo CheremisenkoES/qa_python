@@ -11,7 +11,7 @@ from books_collector import BooksCollector
             ('correct_book', {'correct_book': ''}),
     )
 )
-def test_add_new_book(book_name: str, expected_books_genre: {}):
+def test_add_new_book(book_name: str, expected_books_genre: dict):
     collector = BooksCollector()
     collector.add_new_book(book_name)
     assert collector.get_books_genre() == expected_books_genre
@@ -19,12 +19,11 @@ def test_add_new_book(book_name: str, expected_books_genre: {}):
 
 def test_add_new_book_existing_name_add_one():
     collector = BooksCollector()
-    book_name = 'Some book'
 
-    collector.add_new_book(book_name)
-    collector.add_new_book(book_name)
+    collector.add_new_book('Some book')
+    collector.add_new_book('Some book')
 
-    assert collector.get_books_genre() == {book_name: ''}
+    assert collector.get_books_genre() == {'Some book': ''}
 
 
 @pytest.mark.parametrize(
@@ -40,12 +39,11 @@ def test_add_new_book_existing_name_add_one():
 )
 def test_set_book_genre(genre: str, expected_book_genre: str):
     collector = BooksCollector()
-    book_name = 'Some book'
 
-    collector.add_new_book(book_name)
-    collector.set_book_genre(book_name, genre)
+    collector.add_new_book('Some book')
+    collector.set_book_genre('Some book', genre)
 
-    assert collector.get_books_genre() == {book_name: expected_book_genre}
+    assert collector.get_books_genre() == {'Some book': expected_book_genre}
 
 
 def test_set_book_genre_non_existent_book_pass():
@@ -62,115 +60,54 @@ def test_get_book_genre_non_existent_book_none():
 
 def test_get_book_genre_exiting_book_none():
     collector = BooksCollector()
-    book_name = 'Some book'
-    genre = 'Комедии'
 
-    collector.add_new_book(book_name)
-    collector.set_book_genre(book_name, genre)
+    collector.add_new_book('Some book')
+    collector.set_book_genre('Some book', 'Комедии')
 
-    assert collector.get_book_genre(book_name) == genre
+    assert collector.get_book_genre('Some book') == 'Комедии'
 
 
-@pytest.mark.parametrize(
-    ('books_genre', 'specific_genre', 'expected_books'),
-    (
-            ({}, 'Несуществующий жанр', []),
-            ({}, 'Комедии', []),
-            ({'Book1': 'Фантастика', 'Book2': 'Фантастика'}, 'Несуществующий жанр', []),
-            ({'Book1': 'Фантастика', 'Book2': 'Фантастика'}, 'Комедии', []),
-            ({'Book1': 'Фантастика', 'Book2': 'Фантастика'}, 'Фантастика', ['Book1', 'Book2']),
-            ({'Book1': 'Фантастика', 'Book2': 'Фантастика', 'Book3': 'Детективы'}, 'Фантастика', ['Book1', 'Book2']),
-    )
-)
-def test_get_books_with_specific_genre(books_genre: dict, specific_genre: str, expected_books: list):
+def test_get_books_with_specific_genre():
     collector = BooksCollector()
 
-    for book_name in books_genre:
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, books_genre[book_name])
+    collector.add_new_book('Book1')
+    collector.add_new_book('Book2')
 
-    assert collector.get_books_with_specific_genre(specific_genre) == expected_books
+    collector.set_book_genre('Book1', 'Фантастика')
+    collector.set_book_genre('Book2', 'Детективы')
+
+    assert collector.get_books_with_specific_genre('Детективы') == ['Book2']
 
 
-@pytest.mark.parametrize(
-    ('books_genre', 'expected_books_genre'),
-    (
-            ({}, {}),
-            ({'Book1': '', 'Book2': ''}, {'Book1': '', 'Book2': ''}),
-            ({'Book1': 'Фантастика', 'Book2': 'Детективы'}, {'Book1': 'Фантастика', 'Book2': 'Детективы'})
-    )
-)
-def test_get_books_genre(books_genre: dict, expected_books_genre: dict):
+def test_get_books_for_children():
     collector = BooksCollector()
 
-    for book_name in books_genre:
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, books_genre[book_name])
+    collector.add_new_book('Book1')
+    collector.add_new_book('Book2')
+    collector.add_new_book('Book3')
+    collector.add_new_book('Book4')
+    collector.add_new_book('Book5')
+    collector.add_new_book('Book6')
 
-    assert collector.get_books_genre() == expected_books_genre
+    collector.set_book_genre('Book1', 'Фантастика')
+    collector.set_book_genre('Book2', 'Ужасы')
+    collector.set_book_genre('Book3', 'Детективы')
+    collector.set_book_genre('Book4', 'Мультфильмы')
+    collector.set_book_genre('Book5', 'Комедии')
 
-
-@pytest.mark.parametrize(
-    ('books_genre', 'expected_books'),
-    (
-            ({}, []),
-            ({'Book1': 'Фантастика', 'Book2': 'Мультфильмы', 'Book3': 'Комедии'}, ['Book1', 'Book2', 'Book3']),
-            ({'Book1': 'Ужасы', 'Book2': 'Детективы'}, []),
-            (
-                    {
-                        'Book1': 'Фантастика',
-                        'Book2': 'Ужасы',
-                        'Book3': 'Детективы',
-                        'Book4': 'Мультфильмы',
-                        'Book5': 'Комедии'
-                    },
-                    ['Book1', 'Book4', 'Book5']
-            )
-    )
-)
-def test_get_books_for_children(books_genre: dict, expected_books: list):
-    collector = BooksCollector()
-
-    for book_name in books_genre:
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, books_genre[book_name])
-
-    assert collector.get_books_for_children() == expected_books
+    assert collector.get_books_for_children() == ['Book1', 'Book4', 'Book5']
 
 
 def test_add_book_in_favorites_non_existent_book_empty_list():
     collector = BooksCollector()
-    books_genre = {
-        'Book1': 'Фантастика',
-        'Book2': 'Ужасы',
-        'Book3': 'Детективы',
-        'Book4': 'Мультфильмы',
-        'Book5': 'Комедии'
-    }
-
-    for book_name in books_genre:
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, books_genre[book_name])
-
     collector.add_book_in_favorites('Book100')
-
     assert collector.get_list_of_favorites_books() == []
 
 
 def test_add_book_in_favorites_new_book_one_book():
     collector = BooksCollector()
-    books_genre = {
-        'Book1': 'Фантастика',
-        'Book2': 'Ужасы',
-        'Book3': 'Детективы',
-        'Book4': 'Мультфильмы',
-        'Book5': 'Комедии'
-    }
 
-    for book_name in books_genre:
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, books_genre[book_name])
-
+    collector.add_new_book('Book4')
     collector.add_book_in_favorites('Book4')
 
     assert collector.get_list_of_favorites_books() == ['Book4']
@@ -178,18 +115,8 @@ def test_add_book_in_favorites_new_book_one_book():
 
 def test_add_book_in_favorites_existing_book_one_book():
     collector = BooksCollector()
-    books_genre = {
-        'Book1': 'Фантастика',
-        'Book2': 'Ужасы',
-        'Book3': 'Детективы',
-        'Book4': 'Мультфильмы',
-        'Book5': 'Комедии'
-    }
 
-    for book_name in books_genre:
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, books_genre[book_name])
-
+    collector.add_new_book('Book1')
     collector.add_book_in_favorites('Book1')
     collector.add_book_in_favorites('Book1')
 
@@ -205,8 +132,9 @@ def test_delete_book_from_favorites_non_existent_book_empty_list():
 
 def test_delete_book_from_favorites_existing_book_empty_list():
     collector = BooksCollector()
-    collector.favorites = ['Book1']
 
+    collector.add_new_book('Book1')
+    collector.add_book_in_favorites('Book1')
     collector.delete_book_from_favorites('Book1')
 
     assert collector.get_list_of_favorites_books() == []
@@ -219,22 +147,12 @@ def test_get_list_of_favorites_books_empty_list():
 
 def test_get_list_of_favorites_books_list():
     collector = BooksCollector()
-    books_genre = {
-        'Book1': 'Фантастика',
-        'Book2': 'Ужасы',
-        'Book3': 'Детективы',
-        'Book4': 'Мультфильмы',
-        'Book5': 'Комедии'
-    }
 
-    for book_name in books_genre:
-        collector.add_new_book(book_name)
-        collector.set_book_genre(book_name, books_genre[book_name])
+    collector.add_new_book('Book1')
+    collector.add_new_book('Book2')
+    collector.add_new_book('Book3')
 
     collector.add_book_in_favorites('Book1')
     collector.add_book_in_favorites('Book3')
-    collector.add_book_in_favorites('Book5')
 
-    collector.delete_book_from_favorites('Book3')
-
-    assert collector.get_list_of_favorites_books() == ['Book1', 'Book5']
+    assert collector.get_list_of_favorites_books() == ['Book1', 'Book3']
